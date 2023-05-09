@@ -1,20 +1,21 @@
 #encoding: utf-8
 
+import random
 from bs4 import BeautifulSoup
 import urllib.request
 import re
 
 """
-# TODO:   Implement
-# function: get_players_links_by_team(team_name) 
+#
+# TODO: get_players_links_by_team(team_name) 
 #   :param team_name: Nombre del equipo
-#   :return: Lista con los nombre y links de los jugadores del equipo
-# function: get_news_links_by_team(team_name) 
+#   :return: Dos listas con los nombres y links de los jugadores del equipo
+# TODO: get_news_links_by_team(team_name) 
 #   :param team_name: Nombre del equipo
 #   :return: Lista con los nombre y links de las ultimas noticias
-# function: get_latest_news()
+# TODO: get_latest_news()
 #   :return: Lista de las ultimas noticias
-# funcion: get_latest_news_by_team(team_name)
+# TODO: get_latest_news_by_team(team_name)
 #   :param team_name: Nombre del equipo
     :return: Lista de las ultimas noticias del equipo
 """
@@ -34,11 +35,37 @@ def get_teams_links_and_names():
         links.append(t.get("href"))
     return(names, links)
 
-""" TESTS
+def get_players_links_by_team(team_name):
+    """
+    :param team_name: Nombre del equipo / Name of the team
+    :return: Dos listas con los nombres y links de los jugadores del equipo / Two list, with players names and players links
+    """
+    names=[]
+    links=[]
+    link = "https://www.futbolfantasy.com/laliga/equipos/"+team_name+"/plantilla"
+    html = urllib.request.urlopen(link)
+    s = BeautifulSoup(html, "lxml")
+    players=s.find_all("a", class_="jugador")
+    for p in players:
+        #FIXME: Combinar las dos expresiones regulares
+        name=re.sub(r"\d+\. |\s+$",'',p.text)
+        names.append(re.sub(r"^\s+","",name))
+    for n in names:
+        print(n)
+
+
 if __name__ == "__main__":
+
+#TESTS
+    teams_test=["betis", "sevilla"]
+    get_players_links_by_team(teams_test[1])
+
+    """
     [names, links]=get_teams_links_and_names()
+    dic=dict(zip(names, links))
+    print(dic["Betis"])
     for t,l in zip(names, links):
         print(t+"\n")
         print(l+"\n")
-
-END TESTS """
+"""
+#END TESTS 
