@@ -6,18 +6,13 @@ import urllib.request
 import re
 
 """
-#
-# TODO: get_players_links_by_team(team_name) 
-#   :param team_name: Nombre del equipo
-#   :return: Dos listas con los nombres y links de los jugadores del equipo
-# TODO: get_news_links_by_team(team_name) 
-#   :param team_name: Nombre del equipo
-#   :return: Lista con los nombre y links de las ultimas noticias
-# TODO: get_latest_news()
-#   :return: Lista de las ultimas noticias
+# TODO: get_news_by_player(player_name)
+#   :param player_name: Nombre del jugador / Name of the player
+#   :return: Lista con los nombres y links de las noticias del jugador / Two list, with players names and players links
 # TODO: get_latest_news_by_team(team_name)
 #   :param team_name: Nombre del equipo
-    :return: Lista de las ultimas noticias del equipo
+    :return: Lista de las ultimas noticias del equipo y sus links
+
 """
 
 def get_teams_links_and_names():
@@ -37,6 +32,7 @@ def get_teams_links_and_names():
 
 def get_players_links_by_team(team_name):
     """
+    FIXME: devolver un diccionario 
     :param team_name: Nombre del equipo / Name of the team
     :return: Dos listas con los nombres y links de los jugadores del equipo / Two list, with players names and players links
     """
@@ -47,20 +43,39 @@ def get_players_links_by_team(team_name):
     s = BeautifulSoup(html, "lxml")
     players=s.find_all("a", class_="jugador")
     for p in players:
-        #FIXME: Combinar las dos expresiones regulares
+        # FIXME: Combinar las dos expresiones regulares
         name=re.sub(r"\d+\. |\s+$",'',p.text)
         names.append(re.sub(r"^\s+","",name))
-    for n in names:
-        print(n)
+        links.append(p.get("href"))
+    return(names, links)
 
+def get_latest_news():
+    """
+    :return: Lista de las ultimas noticias / List of the latest news
+    """
+    news=[]
+    links=[]
+    link = "https://www.futbolfantasy.com/laliga/noticias"
+    html = urllib.request.urlopen(link)
+    s = BeautifulSoup(html, "lxml")
+    raw=s.find("div", class_="list_noticias_wrapper").find_all("div", class_="noticia")
+    for n in raw:
+        #links.append(n.find("a", class_="link").get("href"))
+        news.append(n.find("a", class_="link").text)
+    return(news)
 
 if __name__ == "__main__":
-
 #TESTS
-    teams_test=["betis", "sevilla"]
-    get_players_links_by_team(teams_test[1])
 
-    """
+    news=get_latest_news()
+    for n in news:
+        print(n)
+"""
+    teams_test=["betis", "sevilla"]
+    for t in teams_test:
+        [names,links]=get_players_links_by_team(t)
+
+    
     [names, links]=get_teams_links_and_names()
     dic=dict(zip(names, links))
     print(dic["Betis"])
