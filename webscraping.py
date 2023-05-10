@@ -6,12 +6,10 @@ import urllib.request
 import re
 
 """
+# FIXME: Link must be constant and global
 # TODO: get_news_by_player(player_name)
 #   :param player_name: Nombre del jugador / Name of the player
 #   :return: Lista con los nombres y links de las noticias del jugador / Two list, with players names and players links
-# TODO: get_latest_news_by_team(team_name)
-#   :param team_name: Nombre del equipo
-    :return: Lista de las ultimas noticias del equipo y sus links
 
 """
 
@@ -60,16 +58,32 @@ def get_latest_news():
     s = BeautifulSoup(html, "lxml")
     raw=s.find("div", class_="list_noticias_wrapper").find_all("div", class_="noticia")
     for n in raw:
-        #links.append(n.find("a", class_="link").get("href"))
+        links.append(n.find("a", class_="link").get("href"))
         news.append(n.find("a", class_="link").text)
-    return(news)
+    return(news,links)
+
+def get_latest_news_by_team(team_name):
+#   :param team_name: Nombre del equipo
+#   :return: Lista de las ultimas noticias del equipo y sus links
+#   FIXME: Implement method for more pages
+#   FIXME: put a limit in number of news to be added
+    news=[]
+    links=[]
+    link = "https://www.futbolfantasy.com/laliga/equipos/"+team_name+"/noticias"
+    html = urllib.request.urlopen(link)
+    s = BeautifulSoup(html, "lxml")
+    raw=s.find("div", class_="list_noticias_wrapper").find_all("div", class_="noticia")
+    for n in raw:
+        links.append(n.find("a", class_="link").get("href"))
+        news.append(n.find("a", class_="link").text)
+    return(news,links)
 
 if __name__ == "__main__":
 #TESTS
 
-    news=get_latest_news()
-    for n in news:
-        print(n)
+    [news,links]=get_latest_news_by_team("athletic")
+    for n,l in zip(news,links):
+        print(n,l)
 """
     teams_test=["betis", "sevilla"]
     for t in teams_test:
